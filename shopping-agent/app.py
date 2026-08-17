@@ -50,7 +50,7 @@ def select_data_mode() -> str:
 
     return selected
 
-
+# not used (rvk)
 async def get_assistant_reply(conversation):
     """Ask the agent, retrying if the free model returns an empty response."""
     for attempt in range(3):
@@ -171,7 +171,7 @@ async def main():
         if intent == "submit_feedback":
             # Use async feedback handler (it will fall back to sync heuristics)
             try:
-                from workflows.feedback_workflow import handle_feedback_async
+                from workflows.feedback_workflow import handle_feedback_async #why this function is imported again while imported at top (rvk)
 
                 result = await handle_feedback_async(user_text)
             except Exception:
@@ -196,6 +196,7 @@ async def main():
             print()
             continue
 
+        #user message TextMessage could have been stored and used again here instead of calling function again (rvk)
         conversation.append(TextMessage(content=user_text, source="User"))
         conversation.append(
             TextMessage(content=assistant_text, source="ShoppingAssistant")

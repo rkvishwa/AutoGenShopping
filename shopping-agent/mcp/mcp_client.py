@@ -1,33 +1,30 @@
 import asyncio
-import sys
-from pathlib import Path
+from mcp import Client
+import json
 
-try:
-    from mcp import ClientSession, StdioServerParameters
-    from mcp.client.stdio import stdio_client
-except ImportError:
-    # mcp library fallback placeholder until pip install mcp is run
-    ClientSession = None
-    StdioServerParameters = None
-    stdio_client = None
+TOOLS = [
+    "list_categories": "kapruka_list_categories",
+    "get_product": "kapruka_get_product",
+    "search_products": "kapruka_search_products",
+    "create_order": "kapruka_create_order",
+    "track_order": "kapruka_track_order",
+    "options_card": "kapruka_render_options_card",
+    "delivery_cities": "kapruka_list_delivery_cities",
+    "check_delivery": "kapruka_check_delivery",
+]
 
-SERVER_SCRIPT = str(Path(__file__).parent / "kapruka_server.py")
-
-
-async def call_kapruka_tool(tool_name: str, arguments: dict):
-    """Generic async helper function to invoke tools on the Kapruka MCP Server."""
-    if stdio_client is None:
-        raise RuntimeError(
-            "The 'mcp' package is not installed. Please run 'pip install mcp'."
-        )
-
-    server_params = StdioServerParameters(
-        command=sys.executable,
-        args=[SERVER_SCRIPT],
-    )
-
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            result = await session.call_tool(tool_name, arguments)
-            return result.content
+async def tool_calling(tool: str, param: dict, response_format: str = "json") -> dict:
+    if tool not in TOOLS:
+        return {"status": "failed", "message": "tool not found"}
+    
+    async with Client("https://mcp.kapruka.com/mcp") as client:
+        result = await client.call_tool(tool, {"params": {**param, "response_format": response_format}})
+        
+        if result.is_error:
+            return {"status": "failed", "message": result.content[0].text}
+        else:
+            if response_format == "json":
+                return {"status": "success", "message": json.loads(result.content[0].text)}
+            else:
+                return {"status": "success", "message": result.content[0].text}
+                
