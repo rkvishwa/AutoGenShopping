@@ -1,9 +1,8 @@
 import asyncio
-from mcp_client import TOOLS, tool_calling
-
-result = asyncio.run(tool_calling(TOOLS[0], {"depth": 1}, "markdown"))
-print(result['message'])
+from mcp_client import tool_calling
 
 def get_categories() -> str:
-    result = asyncio.run(tool_calling(TOOLS["list_categories"], {"depth": 1}, "markdown"))
+    result = asyncio.run(tool_calling("list_categories", {"depth": 1}, "markdown"))
     return result['message']
+
+print(get_categories())
