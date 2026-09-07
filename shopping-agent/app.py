@@ -19,6 +19,8 @@ from workflows.feedback_workflow import (
 )
 from workflows.chat_workflow import handle_chat
 
+from workflows.category_workflow import show_categories
+
 from autogen_agentchat.messages import TextMessage
 
 warnings.filterwarnings(
@@ -69,6 +71,7 @@ async def get_assistant_reply(conversation):
 
 async def main():
     select_data_mode()
+    data_mode = get_data_mode()
     print("Shopping assistant is ready. Type 'exit' to stop.")
 
     # Keep the full conversation so follow-up messages make sense.
@@ -137,6 +140,21 @@ async def main():
             print("Assistant:", result)
             print()
             continue
+        
+        if intent == "show_category":
+            if data_mode == "fake_store":
+                print("Assintant: This feature is only available in MCP mode")
+                continue
+            
+            result = await show_categories()
+            if not result:
+                print("Assistant: [category_workflow is empty/unimplemented]")
+                print()
+                continue
+            print("Assistant:", result)
+            print()
+            continue
+            
 
         if intent in {"add_to_cart", "view_cart", "remove_from_cart", "clear_cart", "checkout"}:
             result = handle_cart(intent, user_text)
