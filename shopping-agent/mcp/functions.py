@@ -18,13 +18,12 @@ def get_product(p_id: str, currency : str = "LKR", type : str = "") -> str:
     result = asyncio.run(tool_calling("get_product", {"product_id": p_id, "currency": currency, "type": type}, "markdown"))
     return result['message']
 
-def create_order(p_id: str, recipient: str,address: str, city: str, date: str, sender: str, location_type: str = "house", msg: str = "", quantity: int = 1, instructions: str = "", icing_text: str = "", gift_message: str = "", currency : str = "LKR") -> str:
+def create_order(p_id: str, recipient: str,address: str, city: str, date: str, sender: str, location_type: str = "house", msg: str = "", quantity: int = 1, instructions: str = "", icing_text: str = "", currency : str = "LKR") -> str:
     cart = [{"product_id": p_id, "quantity": quantity, "icing_text": icing_text}]
     kcity = delivery_cities(city)
     delivery = address + kcity + location_type + date + instructions
 
-    result = asyncio.run(tool_calling("create_order", {"cart": cart, "recipient": recipient, "delivery": delivery, "sender": sender, "gift_message": gift_message, "currency": currency}, "markdown"))
-
+    result = asyncio.run(tool_calling("create_order", { "fcart": cart,"recipient": recipient, "delivery": delivery, "sender": sender, "gift_message": msg, "currency": currency}, "markdown"))
     return result['message']
 
 print(create_order("EF_PC_FLOW0V841POD00089P", "Ashen", "wadada", "kurunegala", "2026-01-09", "Tharindu" ))
