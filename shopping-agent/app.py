@@ -146,7 +146,7 @@ async def main():
                 print("Assintant: This feature is only available in MCP mode")
                 continue
             
-            result = await show_categories()
+            result = show_categories()
             if not result:
                 print("Assistant: [category_workflow is empty/unimplemented]")
                 print()
@@ -157,6 +157,11 @@ async def main():
             
 
         if intent in {"add_to_cart", "view_cart", "remove_from_cart", "clear_cart", "checkout"}:
+            if data_mode == "mcp":
+                print("Assistant: This feature is only available in Local (Fake Store) mode.")
+                print()
+                continue
+
             result = handle_cart(intent, user_text)
             if not result:
                 print("Assistant: [cart_workflow is empty/unimplemented]")
@@ -177,6 +182,11 @@ async def main():
             continue
 
         if intent == "cancel_order":
+            if data_mode == "mcp":
+                print("Assistant: This feature is only available in Local (Fake Store) mode.")
+                print()
+                continue
+
             result = handle_cancel(user_text)
             if not result:
                 print("Assistant: [cancel_workflow is empty/unimplemented]")
@@ -187,6 +197,11 @@ async def main():
             continue
 
         if intent == "submit_feedback":
+            if data_mode == "mcp":
+                print("Assistant: This feature is only available in Local (Fake Store) mode.")
+                print()
+                continue
+
             # Use async feedback handler (it will fall back to sync heuristics)
             try:
                 from workflows.feedback_workflow import handle_feedback_async #why this function is imported again while imported at top (rvk)
